@@ -5,25 +5,18 @@ class APIFeatures {
   }
 
   filter() {
-    // 1. Filtering
-    var queryObj = { ...this.queryStr }; // { difficulty : easy}
+    // 1. FILTERING
+    var queryObj = { ...this.queryStr };
 
-    // 2. Exclude Fields
-    var excludeFields = ["sort", "fields", "limit", "page"];
-
+    // 2. EXCLUDE FIELDS
+    const excludeFields = ["page", "sort", "fields", "limit"];
     excludeFields.forEach((el) => delete queryObj[el]);
 
-    console.log(queryObj);
-
-    var queryObjStr = JSON.stringify(queryObj);
-
     // 3. Advanced Filtering
-    queryObjStr = queryObjStr.replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (item) => `$${item}`
-    );
+    let queryObjStr = JSON.stringify(queryObj);
+    queryObjStr = queryObjStr.replace(/\b(gte|gt|lte|lt)\b/g, (el) => `$${el}`);
 
-    this.query = this.query.find(JSON.parse(queryObjStr));
+    this.query = this.query.find(JSON.parse(queryObjStr)); // BUILD the QUERY
 
     return this;
   }
@@ -31,20 +24,20 @@ class APIFeatures {
   sort() {
     // 4. Sorting
     if (this.queryStr.sort) {
-      this.query = this.query.sort(this.queryStr.sort.split(",").join(" "));
+      this.query = this.query.sort(this.queryStr.sort.split(",").join(" ")); // Multiple Sorting
     } else {
-      this.query = this.query.sort("-createdAt");
+      this.query = this.query.sort("-createdAt"); // Default Sorting
     }
 
     return this;
   }
 
-  limit() {
-    // 5. Limiting the fields
+  select() {
+    // 5. Selecting the fields
     if (this.queryStr.fields) {
       this.query = this.query.select(this.queryStr.fields.split(",").join(" "));
     } else {
-      this.query = this.query.select("-__v");
+      this.query = this.query.select("-__v"); // Defaul Select
     }
 
     return this;
@@ -52,10 +45,10 @@ class APIFeatures {
 
   paginate() {
     // 6. Pagination
-    const page = this.queryStr.page * 1 || 1;
-    const limit = this.queryStr.limit * 1 || 100;
+    let page = this.queryStr.page * 1 || 1;
+    let limit = this.queryStr.limit * 1 || 100;
 
-    const skip = (page - 1) * limit;
+    let skip = (page - 1) * limit;
 
     this.query = this.query.skip(skip).limit(limit);
 

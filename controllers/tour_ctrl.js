@@ -1,84 +1,9 @@
 const Tour = require("../models/dataModel");
-const APF = require("../api_features/api_features");
+const APIFeatures = require("../api_features/api_features");
+const AppError = require("../api_features/appError");
 
-class APIFeatures {
-  constructor(query, queryStr) {
-    this.query = query;
-    this.queryStr = queryStr;
-  }
-
-  filter() {
-    // 1. FILTERING
-    var queryObj = { ...this.queryStr };
-
-    console.log(queryObj);
-
-    // 2. EXCLUDE FIELDS
-    const excludeFields = ["page", "sort", "fields", "limit"];
-    excludeFields.forEach((el) => delete queryObj[el]);
-
-    console.log(queryObj);
-
-    // 3. Advanced Filtering
-    let queryObjStr = JSON.stringify(queryObj);
-    queryObjStr = queryObjStr.replace(/\b(gte|gt|lte|lt)\b/g, (el) => `$${el}`);
-
-    this.query = this.query.find(JSON.parse(queryObjStr)); // BUILD the QUERY
-
-    return this;
-  }
-
-  sort() {
-    console.log(this.queryStr);
-    // 4. Sorting
-    if (this.queryStr.sort) {
-      this.query = this.query.sort(this.queryStr.sort.split(",").join(" ")); // Multiple Sorting
-    } else {
-      this.query = this.query.sort("-createdAt"); // Default Sorting
-    }
-
-    return this;
-  }
-
-  select() {
-    // 5. Selecting the fields
-    if (this.queryStr.fields) {
-      this.query = this.query.select(this.queryStr.fields.split(",").join(" "));
-    } else {
-      this.query = this.query.select("-__v"); // Defaul Select
-    }
-
-    return this;
-  }
-
-  paginate() {
-    // 6. Pagination
-    let page = this.queryStr.page * 1 || 1;
-    let limit = this.queryStr.limit * 1 || 100;
-
-    console.log(page);
-    console.log(limit);
-
-    let skip = (page - 1) * limit;
-
-    console.log(skip);
-
-    this.query = this.query.skip(skip).limit(limit);
-
-    return this;
-  }
-}
-
-exports.getTours = async (req, res) => {
+exports.getTours = async (req, res, next) => {
   try {
-    // const features = new APF(Tour.find(), req.query)
-    //   .filter()
-    //   .sort()
-    //   .select()
-    //   .paginate();
-
-    // const tours = await features.query; // EXECUTE the Query
-
     const features = new APIFeatures(Tour.find(), req.query)
       .filter()
       .sort()
@@ -87,6 +12,8 @@ exports.getTours = async (req, res) => {
     console.log("-------");
 
     const tours = await features.query; // Execute the Query
+
+    tours = "hi";
 
     res.status(200).json({
       status: "success",
@@ -97,10 +24,7 @@ exports.getTours = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(401).json({
-      status: "fail",
-      message: err,
-    });
+    next(new AppError("Something wrong....", 404));
   }
 };
 

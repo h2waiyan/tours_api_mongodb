@@ -8,7 +8,7 @@ console.log(app.get("env")); // Express Env V
 const port = 3000;
 
 const uri =
-  "mongodb+srv://hwy:<password>@xtours.gzchnul.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://user:<password>@xtours.gzchnul.mongodb.net/?retryWrites=true&w=majority";
 
 mongoose
   .connect(uri.replace("<password>", process.env.DB_PASSWORD))
