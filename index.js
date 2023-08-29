@@ -3,6 +3,11 @@ const app = require("./app");
 
 console.log(app.get("env")); // Express Env V
 
+process.on("uncaughtException", (err) => {
+  console.log(err.name, err.message);
+  process.exit(1);
+});
+
 // console.log(process.env); // Nodejs Env V
 
 const port = 3000;
@@ -17,6 +22,14 @@ mongoose
     console.log("Conntect to database");
   });
 
-app.listen(port, () => {
+server = app.listen(port, () => {
   console.log(`App is runing on port ${port}`);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.log(err.name, err.message);
+  console.log("UnhandledRejection");
+  server.close(() => {
+    process.exit(1);
+  });
 });

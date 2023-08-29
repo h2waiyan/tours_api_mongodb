@@ -1,32 +1,29 @@
 const Tour = require("../models/dataModel");
 const APIFeatures = require("../api_features/api_features");
 const AppError = require("../api_features/appError");
+const catchAsync = require("../api_features/catchAsync");
 
-exports.getTours = async (req, res, next) => {
-  try {
-    const features = new APIFeatures(Tour.find(), req.query)
-      .filter()
-      .sort()
-      .select()
-      .paginate();
-    console.log("-------");
+exports.getTours = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(Tour.find(), req.query)
+    .filter()
+    .sort()
+    .select()
+    .paginate();
+  console.log("-------");
 
-    const tours = await features.query; // Execute the Query
+  const tours = await features.query; // Execute the Query
 
-    tours = "hi";
+  tours = "hi";
 
-    res.status(200).json({
-      status: "success",
-      requestedAt: req.requestTime,
-      result: tours.length,
-      data: {
-        tours,
-      },
-    });
-  } catch (err) {
-    next(new AppError("Something wrong....", 404));
-  }
-};
+  res.status(200).json({
+    status: "success",
+    requestedAt: req.requestTime,
+    result: tours.length,
+    data: {
+      tours,
+    },
+  });
+});
 
 exports.postNewTour = async (req, res) => {
   try {

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon index.js",
+    "start:dev": "NODE_ENVIRONMENT=development nodemon index.js",
     "start:prod": "NODE_ENVIRONMENT=production x=23 nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
